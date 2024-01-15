@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 ARG TARGETPLATFORM=linux/amd64
-ARG RUNNER_VERSION
-ARG RUNNER_CONTAINER_HOOKS_VERSION
+ARG RUNNER_VERSION=2.311.0
+ARG RUNNER_CONTAINER_HOOKS_VERSION=0.5.0
 # Docker and Docker Compose arguments
 ARG CHANNEL=stable
 ARG DOCKER_VERSION=24.0.7
@@ -46,7 +46,6 @@ RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
     && chmod +x /usr/bin/dumb-init
 
 ENV RUNNER_ASSETS_DIR=/runnertmp
-RUN echo ${TARGETPLATFORM} \
 RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
     && if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "i386" ]; then export ARCH=x64 ; fi \
     && mkdir -p "$RUNNER_ASSETS_DIR" \
