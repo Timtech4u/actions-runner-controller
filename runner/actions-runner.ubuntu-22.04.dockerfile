@@ -17,13 +17,32 @@ RUN apt-get update -y \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
-    curl \
+    apt-transport-https \
+    apt-utils \
+    build-essential \
     ca-certificates \
+    curl \
+    gcc \
     git \
+    iproute2 \
+    iptables \
     jq \
-    sudo \
+    libyaml-dev \
+    locales \
+    lsb-release \
+    make \
+    openssl \
+    pigz \
+    pkg-config \
+    software-properties-common \
+    time \
+    tzdata \
+    uidmap \
     unzip \
+    wget \
+    xz-utils \
     zip \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Download latest git-lfs version
