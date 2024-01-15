@@ -10,6 +10,7 @@ ARG DOCKER_COMPOSE_VERSION=v2.23.0
 ARG DUMB_INIT_VERSION=1.2.5
 ARG RUNNER_USER_UID=1001
 ARG DOCKER_GROUP_GID=121
+ARG GOLANG_VERSION=1.21.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -108,6 +109,35 @@ RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
     && ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/docker-compose \
     && which docker-compose \
     && docker compose version
+
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -rf awscliv2.zip ./aws
+
+# Install Terraform
+curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - \
+    && apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+    && apt-get update && apt-get install terraform
+
+# Kind
+curl -Lo ./kind "https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(uname -m)" \
+    && chmod +x ./kind \
+    && mv ./kind /usr/local/bin/kind
+
+# Install GoLang 
+RUN wget -L https://go.dev/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
+RUN rm go${GOLANG_VERSION}.linux-amd64.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Install helm
+RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Install Node
+COPY tools.sh /tools.sh
+RUN bash /tools.sh && rm /tools.sh
 
 # We place the scripts in `/usr/bin` so that users who extend this image can
 # override them with scripts of the same name placed in `/usr/local/bin`.
